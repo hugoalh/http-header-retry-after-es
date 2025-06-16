@@ -30,12 +30,14 @@ export class HTTPHeaderRetryAfter {
 		} else if (input instanceof HTTPHeaderRetryAfter) {
 			this.#timestamp = new Date(input.#timestamp);
 		} else {
-			const inputRaw: string = (
-				(
-					input instanceof Headers ||
-					input instanceof Response
-				) ? ((input instanceof Headers) ? input : input.headers).get("Retry-After") : input
-			) ?? "";
+			let inputRaw: string;
+			if (input instanceof Response) {
+				inputRaw = input.headers.get("Retry-After") ?? "0";
+			} else if (input instanceof Headers) {
+				inputRaw = input.get("Retry-After") ?? "0";
+			} else {
+				inputRaw = input;
+			}
 			if (regexpDecimalInteger.test(inputRaw)) {
 				this.#timestamp = new Date(Date.now() + Number(inputRaw) * 1000);
 			} else if (regexpHTTPDate.test(inputRaw)) {
