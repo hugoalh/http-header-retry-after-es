@@ -18,6 +18,7 @@ keywords:
   - "javascript"
   - "js"
   - "retry-after"
+  - "rfc9110"
   - "ts"
   - "typescript"
 license: "MIT"

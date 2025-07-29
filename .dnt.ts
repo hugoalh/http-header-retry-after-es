@@ -18,7 +18,8 @@ await invokeDenoNodeJSTransformer({
 		keywords: [
 			"header",
 			"http",
-			"retry-after"
+			"retry-after",
+			"rfc9110"
 		],
 		homepage: "https://github.com/hugoalh/http-header-retry-after-es#readme",
 		bugs: {

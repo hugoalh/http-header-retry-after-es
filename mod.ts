@@ -9,12 +9,12 @@ export class HTTPHeaderRetryAfter {
 	}
 	#timestamp: Date;
 	/**
-	 * Handle the HTTP header `Retry-After` according to the specification RFC 9110.
+	 * Initialize.
 	 * @param {number | string | Date | Headers | Response} input Input.
 	 */
 	constructor(input: number | string | Date | Headers | Response);
 	/**
-	 * Handle the HTTP header `Retry-After` according to the specification RFC 9110.
+	 * Initialize.
 	 * @param {HTTPHeaderRetryAfter} input Input.
 	 * @deprecated This input type is deprecated.
 	 */
@@ -30,20 +30,20 @@ export class HTTPHeaderRetryAfter {
 		} else if (input instanceof HTTPHeaderRetryAfter) {
 			this.#timestamp = new Date(input.#timestamp);
 		} else {
-			let inputRaw: string;
+			let inputFmt: string;
 			if (input instanceof Response) {
-				inputRaw = input.headers.get("Retry-After") ?? "0";
+				inputFmt = input.headers.get("Retry-After") ?? "0";
 			} else if (input instanceof Headers) {
-				inputRaw = input.get("Retry-After") ?? "0";
+				inputFmt = input.get("Retry-After") ?? "0";
 			} else {
-				inputRaw = input;
+				inputFmt = input;
 			}
-			if (regexpDecimalInteger.test(inputRaw)) {
-				this.#timestamp = new Date(Date.now() + Number(inputRaw) * 1000);
-			} else if (regexpHTTPDate.test(inputRaw)) {
-				this.#timestamp = new Date(inputRaw);
+			if (regexpDecimalInteger.test(inputFmt)) {
+				this.#timestamp = new Date(Date.now() + Number(inputFmt) * 1000);
+			} else if (regexpHTTPDate.test(inputFmt)) {
+				this.#timestamp = new Date(inputFmt);
 			} else {
-				throw new SyntaxError(`\`${inputRaw}\` is not a valid HTTP header \`Retry-After\` syntax!`);
+				throw new SyntaxError(`\`${inputFmt}\` is not a valid HTTP header \`Retry-After\` value!`);
 			}
 		}
 	}
@@ -56,14 +56,14 @@ export class HTTPHeaderRetryAfter {
 	}
 	/**
 	 * Get remain time in milliseconds.
-	 * @returns {number} Remain time in milliseconds.
+	 * @returns {number}
 	 */
 	getRemainTimeMilliseconds(): number {
 		return Math.max(0, this.#timestamp.valueOf() - Date.now());
 	}
 	/**
 	 * Get remain time in seconds.
-	 * @returns {number} Remain time in seconds.
+	 * @returns {number}
 	 */
 	getRemainTimeSeconds(): number {
 		return (this.getRemainTimeMilliseconds() / 1000);
@@ -71,23 +71,26 @@ export class HTTPHeaderRetryAfter {
 	/**
 	 * Get `Date`.
 	 * @returns {Date}
+	 * @deprecated Use {@linkcode HTTPHeaderRetryAfter.getDate} instead.
 	 */
 	get date(): Date {
-		return new Date(this.#timestamp);
+		return this.getDate();
 	}
 	/**
 	 * Get remain time in milliseconds.
-	 * @returns {number} Remain time in milliseconds.
+	 * @returns {number}
+	 * @deprecated Use {@linkcode HTTPHeaderRetryAfter.getRemainTimeMilliseconds} instead.
 	 */
 	get remainTimeMilliseconds(): number {
-		return Math.max(0, this.#timestamp.valueOf() - Date.now());
+		return this.getRemainTimeMilliseconds();
 	}
 	/**
 	 * Get remain time in seconds.
-	 * @returns {number} Remain time in seconds.
+	 * @returns {number}
+	 * @deprecated Use {@linkcode HTTPHeaderRetryAfter.getRemainTimeSeconds} instead.
 	 */
 	get remainTimeSeconds(): number {
-		return (this.getRemainTimeMilliseconds() / 1000);
+		return this.getRemainTimeSeconds();
 	}
 }
 export default HTTPHeaderRetryAfter;

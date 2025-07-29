@@ -59,9 +59,6 @@ An ECMAScript (JavaScript & TypeScript) module to handle the [HTTP header `Retry
     getDate(): Date;
     getRemainTimeMilliseconds(): number;
     getRemainTimeSeconds(): number;
-    get date(): Date;
-    get remainTimeMilliseconds(): number;
-    get remainTimeSeconds(): number;
   }
   ```
 
