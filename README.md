@@ -59,6 +59,7 @@ An ECMAScript (JavaScript & TypeScript) module to handle the [HTTP header `Retry
     getDate(): Date;
     getRemainTimeMilliseconds(): number;
     getRemainTimeSeconds(): number;
+    static parse(input: number | string | Date | Headers | Response): HTTPHeaderRetryAfter | null;
   }
   ```
 

@@ -92,5 +92,17 @@ export class HTTPHeaderRetryAfter {
 	get remainTimeSeconds(): number {
 		return this.getRemainTimeSeconds();
 	}
+	/**
+	 * Try to initialize.
+	 * @param {number | string | Date | Headers | Response} input Input.
+	 * @returns {HTTPHeaderRetryAfter | null}
+	 */
+	static parse(input: number | string | Date | Headers | Response): HTTPHeaderRetryAfter | null {
+		try {
+			return new this(input);
+		} catch {
+			return null;
+		}
+	}
 }
 export default HTTPHeaderRetryAfter;
