@@ -60,7 +60,7 @@ export class HTTPHeaderRetryAfter {
 		return (this.getRemainTimeMilliseconds() / 1000);
 	}
 	/**
-	 * Convert to string, in RFC 7231 format.
+	 * Convert to string.
 	 * @returns {string}
 	 */
 	toString(): string {
