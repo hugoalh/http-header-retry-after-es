@@ -1,5 +1,5 @@
+const regexpDateRFC7231 = /^[A-Z][a-z][a-z], \d\d [A-Z][a-z][a-z] \d\d\d\d \d\d:\d\d:\d\d GMT$/;
 const regexpDecimalInteger = /^\d+$/;
-const regexpHTTPDate = /^[A-Z][a-z][a-z], \d\d [A-Z][a-z][a-z] \d\d\d\d \d\d:\d\d:\d\d GMT$/;
 /**
  * Handle the HTTP header `Retry-After` according to the specification RFC 9110.
  */
@@ -12,23 +12,14 @@ export class HTTPHeaderRetryAfter {
 	 * Initialize.
 	 * @param {number | string | Date | Headers | Response} input Input.
 	 */
-	constructor(input: number | string | Date | Headers | Response);
-	/**
-	 * Initialize.
-	 * @param {HTTPHeaderRetryAfter} input Input.
-	 * @deprecated This input type is deprecated.
-	 */
-	constructor(input: HTTPHeaderRetryAfter);
-	constructor(input: number | string | Date | Headers | HTTPHeaderRetryAfter | Response) {
+	constructor(input: number | string | Date | Headers | Response) {
 		if (typeof input === "number") {
-			if (!(input >= 0)) {
-				throw new RangeError(`Parameter \`input\` is not a number which is positive!`);
+			if (!(input >= 0 && input <= Number.MAX_SAFE_INTEGER)) {
+				throw new RangeError(`Parameter \`input\` is not a number which is positive and safe!`);
 			}
 			this.#timestamp = new Date(Date.now() + input * 1000);
 		} else if (input instanceof Date) {
 			this.#timestamp = new Date(input);
-		} else if (input instanceof HTTPHeaderRetryAfter) {
-			this.#timestamp = new Date(input.#timestamp);
 		} else {
 			let inputFmt: string;
 			if (input instanceof Response) {
@@ -38,10 +29,10 @@ export class HTTPHeaderRetryAfter {
 			} else {
 				inputFmt = input;
 			}
-			if (regexpDecimalInteger.test(inputFmt)) {
-				this.#timestamp = new Date(Date.now() + Number(inputFmt) * 1000);
-			} else if (regexpHTTPDate.test(inputFmt)) {
+			if (regexpDateRFC7231.test(inputFmt)) {
 				this.#timestamp = new Date(inputFmt);
+			} else if (regexpDecimalInteger.test(inputFmt)) {
+				this.#timestamp = new Date(Date.now() + Number(inputFmt) * 1000);
 			} else {
 				throw new SyntaxError(`\`${inputFmt}\` is not a valid HTTP header \`Retry-After\` value!`);
 			}
@@ -69,35 +60,18 @@ export class HTTPHeaderRetryAfter {
 		return (this.getRemainTimeMilliseconds() / 1000);
 	}
 	/**
-	 * Get `Date`.
-	 * @returns {Date}
-	 * @deprecated Use {@linkcode HTTPHeaderRetryAfter.getDate} instead.
+	 * Convert to string, in RFC 7231 format.
+	 * @returns {string}
 	 */
-	get date(): Date {
-		return this.getDate();
+	toString(): string {
+		return this.#timestamp.toUTCString();
 	}
 	/**
-	 * Get remain time in milliseconds.
-	 * @returns {number}
-	 * @deprecated Use {@linkcode HTTPHeaderRetryAfter.getRemainTimeMilliseconds} instead.
-	 */
-	get remainTimeMilliseconds(): number {
-		return this.getRemainTimeMilliseconds();
-	}
-	/**
-	 * Get remain time in seconds.
-	 * @returns {number}
-	 * @deprecated Use {@linkcode HTTPHeaderRetryAfter.getRemainTimeSeconds} instead.
-	 */
-	get remainTimeSeconds(): number {
-		return this.getRemainTimeSeconds();
-	}
-	/**
-	 * Try to initialize.
+	 * Initialize in safe way.
 	 * @param {number | string | Date | Headers | Response} input Input.
 	 * @returns {HTTPHeaderRetryAfter | null}
 	 */
-	static parse(input: number | string | Date | Headers | Response): HTTPHeaderRetryAfter | null {
+	static parseSafe(input: number | string | Date | Headers | Response): HTTPHeaderRetryAfter | null {
 		try {
 			return new this(input);
 		} catch {
