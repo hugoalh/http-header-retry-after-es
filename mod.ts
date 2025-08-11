@@ -60,6 +60,13 @@ export class HTTPHeaderRetryAfter {
 		return (this.getRemainTimeMilliseconds() / 1000);
 	}
 	/**
+	 * Stringify.
+	 * @returns {string}
+	 */
+	stringify(): string {
+		return this.toString();
+	}
+	/**
 	 * Convert to string.
 	 * @returns {string}
 	 */
