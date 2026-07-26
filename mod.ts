@@ -1,5 +1,14 @@
 const regexpDateRFC7231 = /^[A-Z][a-z][a-z], \d\d [A-Z][a-z][a-z] \d\d\d\d \d\d:\d\d:\d\d GMT$/;
 const regexpDecimalInteger = /^\d+$/;
+function convertStringInputToTimestamp(input: string): Date {
+	if (regexpDateRFC7231.test(input)) {
+		return new Date(input);
+	}
+	if (regexpDecimalInteger.test(input)) {
+		return new Date(Date.now() + Number(input) * 1000);
+	}
+	throw new SyntaxError(`\`${input}\` is not a valid HTTP header \`Retry-After\` value!`);
+}
 /**
  * Handle the HTTP header `Retry-After` according to the specification RFC 9110.
  */
@@ -18,24 +27,18 @@ export class HTTPHeaderRetryAfter {
 				throw new RangeError(`Parameter \`input\` is not a number which is positive and safe!`);
 			}
 			this.#timestamp = new Date(Date.now() + input * 1000);
+		} else if (typeof input === "string") {
+			this.#timestamp = convertStringInputToTimestamp(input);
 		} else if (input instanceof Date) {
 			this.#timestamp = new Date(input);
+		} else if (input instanceof Headers) {
+			const value: string | null = input.get("Retry-After");
+			this.#timestamp = (value === null) ? new Date() : convertStringInputToTimestamp(value);
+		} else if (input instanceof Response) {
+			const value: string | null = input.headers.get("Retry-After");
+			this.#timestamp = (value === null) ? new Date() : convertStringInputToTimestamp(value);
 		} else {
-			let inputFmt: string;
-			if (input instanceof Response) {
-				inputFmt = input.headers.get("Retry-After") ?? "0";
-			} else if (input instanceof Headers) {
-				inputFmt = input.get("Retry-After") ?? "0";
-			} else {
-				inputFmt = input;
-			}
-			if (regexpDateRFC7231.test(inputFmt)) {
-				this.#timestamp = new Date(inputFmt);
-			} else if (regexpDecimalInteger.test(inputFmt)) {
-				this.#timestamp = new Date(Date.now() + Number(inputFmt) * 1000);
-			} else {
-				throw new SyntaxError(`\`${inputFmt}\` is not a valid HTTP header \`Retry-After\` value!`);
-			}
+			throw new SyntaxError(`Unable to handle \`${input}\` to a valid HTTP header \`Retry-After\` value!`);
 		}
 	}
 	/**
@@ -74,7 +77,7 @@ export class HTTPHeaderRetryAfter {
 		return this.#timestamp.toUTCString();
 	}
 	/**
-	 * Initialize in safe way.
+	 * Initialize, in safe way.
 	 * @param {number | string | Date | Headers | Response} input Input.
 	 * @returns {HTTPHeaderRetryAfter | null}
 	 */

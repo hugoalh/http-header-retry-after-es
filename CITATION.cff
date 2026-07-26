@@ -7,6 +7,7 @@ authors:
   - name: "HUGOALH"
     alias: "hugoalh"
 repository-code: "https://github.com/hugoalh/http-header-retry-after-es"
+abstract: "An ECMAScript module to handle the HTTP header `Retry-After` according to the specification RFC 9110."
 keywords:
   - "ecmascript"
   - "es"

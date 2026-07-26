@@ -3,7 +3,8 @@
 [**⚖️** MIT](./LICENSE.md)
 
 🔗
-[GitHub](https://github.com/hugoalh/http-header-retry-after-es)
+[DistBoard @hugoalh](https://hugoalh.github.io/distboard/http_header_retry_after_ecmascript)
+● [GitHub](https://github.com/hugoalh/http-header-retry-after-es)
 ● [JSR](https://jsr.io/@hugoalh/http-header-retry-after)
 ● [NPM](https://www.npmjs.com/package/@hugoalh/http-header-retry-after)
 
